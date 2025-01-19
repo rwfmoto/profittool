@@ -1,0 +1,117 @@
+import pandas as pd
+import tkinter as tk
+from tkinter import messagebox
+
+class VehicleProfitabilityCalculator:
+    def __init__(self):
+        self.vehicles = []
+
+    def add_vehicle(self, purchase_price, interest_fees, misc_expenses, transport_cost, paint_cost, repair_cost):
+        total_cost = purchase_price + interest_fees + misc_expenses + transport_cost + paint_cost + repair_cost
+        vehicle = {
+            "Purchase Price": purchase_price,
+            "Interest/Fees": interest_fees,
+            "Misc Expenses": misc_expenses,
+            "Transport Cost": transport_cost,
+            "Paint Cost": paint_cost,
+            "Repair Cost": repair_cost,
+            "Total Cost": total_cost,
+            "Projected Sales Price": 0,
+            "Potential Profitability": 0,
+        }
+        self.vehicles.append(vehicle)
+
+    def update_sales_price(self, vehicle_index, sales_price):
+        if 0 <= vehicle_index < len(self.vehicles):
+            self.vehicles[vehicle_index]["Projected Sales Price"] = sales_price
+            self.vehicles[vehicle_index]["Potential Profitability"] = sales_price - self.vehicles[vehicle_index]["Total Cost"]
+        else:
+            print("Invalid vehicle index.")
+
+    def get_vehicle_data(self):
+        return pd.DataFrame(self.vehicles)
+
+def add_vehicle_ui():
+    try:
+        purchase_price = float(purchase_price_entry.get())
+        interest_fees = float(interest_fees_entry.get())
+        misc_expenses = float(misc_expenses_entry.get())
+        transport_cost = float(transport_cost_entry.get())
+        paint_cost = float(paint_cost_entry.get())
+        repair_cost = float(repair_cost_entry.get())
+
+        calculator.add_vehicle(purchase_price, interest_fees, misc_expenses, transport_cost, paint_cost, repair_cost)
+        messagebox.showinfo("Success", "Vehicle added successfully!")
+    except ValueError:
+        messagebox.showerror("Error", "Please enter valid numerical values.")
+
+def update_sales_price_ui():
+    try:
+        vehicle_index = int(vehicle_index_entry.get())
+        sales_price = float(sales_price_entry.get())
+        calculator.update_sales_price(vehicle_index, sales_price)
+        messagebox.showinfo("Success", "Sales price updated successfully!")
+    except ValueError:
+        messagebox.showerror("Error", "Please enter valid numerical values.")
+
+def display_vehicles_ui():
+    vehicle_data = calculator.get_vehicle_data()
+    display_window = tk.Toplevel(root)
+    display_window.title("Vehicle Data")
+    
+    text = tk.Text(display_window, wrap=tk.WORD, width=100, height=20)
+    text.insert(tk.END, vehicle_data.to_string(index=False))
+    text.config(state=tk.DISABLED)
+    text.pack()
+
+calculator = VehicleProfitabilityCalculator()
+
+root = tk.Tk()
+root.title("Vehicle Profitability Calculator")
+
+# Input fields
+tk.Label(root, text="Purchase Price:").grid(row=0, column=0)
+purchase_price_entry = tk.Entry(root)
+purchase_price_entry.grid(row=0, column=1)
+
+tk.Label(root, text="Interest/Fees:").grid(row=1, column=0)
+interest_fees_entry = tk.Entry(root)
+interest_fees_entry.grid(row=1, column=1)
+
+tk.Label(root, text="Misc Expenses:").grid(row=2, column=0)
+misc_expenses_entry = tk.Entry(root)
+misc_expenses_entry.grid(row=2, column=1)
+
+tk.Label(root, text="Transport Cost:").grid(row=3, column=0)
+transport_cost_entry = tk.Entry(root)
+transport_cost_entry.grid(row=3, column=1)
+
+tk.Label(root, text="Paint Cost:").grid(row=4, column=0)
+paint_cost_entry = tk.Entry(root)
+paint_cost_entry.grid(row=4, column=1)
+
+tk.Label(root, text="Repair Cost:").grid(row=5, column=0)
+repair_cost_entry = tk.Entry(root)
+repair_cost_entry.grid(row=5, column=1)
+
+# Buttons
+add_vehicle_button = tk.Button(root, text="Add Vehicle", command=add_vehicle_ui)
+add_vehicle_button.grid(row=6, column=0, columnspan=2)
+
+# Update sales price
+tk.Label(root, text="Vehicle Index:").grid(row=7, column=0)
+vehicle_index_entry = tk.Entry(root)
+vehicle_index_entry.grid(row=7, column=1)
+
+tk.Label(root, text="Sales Price:").grid(row=8, column=0)
+sales_price_entry = tk.Entry(root)
+sales_price_entry.grid(row=8, column=1)
+
+update_sales_price_button = tk.Button(root, text="Update Sales Price", command=update_sales_price_ui)
+update_sales_price_button.grid(row=9, column=0, columnspan=2)
+
+# Display vehicles button
+display_vehicles_button = tk.Button(root, text="Display Vehicles", command=display_vehicles_ui)
+display_vehicles_button.grid(row=10, column=0, columnspan=2)
+
+root.mainloop()
